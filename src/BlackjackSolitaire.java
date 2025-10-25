@@ -5,6 +5,16 @@ public class BlackjackSolitaire {
     private Card[][] gameBoard;
     private int discardsRemaining;
 
+    public BlackjackSolitaire(){
+        // initialize deck and shuffle it
+        this.deck = new Deck();
+        this.deck.shuffle();
+        // initialize gameBoard, 4 rows and 5 cols
+        this.gameBoard = new Card[4][5];
+        // initialize discardsRemaining
+        this.discardsRemaining = 4;
+    }
+
     public void play(){
         // The main game loop that drives everything.
     }
