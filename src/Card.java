@@ -19,12 +19,13 @@ public class Card {
     }
 
     public String toString(){
-        return this.rank + this.suit;
+        // return "%-3s" for better display
+        return String.format("%-3s", this.rank + this.suit);
     }
 
     public static void main(String[] args) {
-        Card card = new Card("10", "H");
+        Card card = new Card("6", "H");
         System.out.println("The card value is " + card.getValue());
-        System.out.println("The card is "+ card.toString());
+        System.out.println("The card is "+ card.toString() + ".");
     }
 }
