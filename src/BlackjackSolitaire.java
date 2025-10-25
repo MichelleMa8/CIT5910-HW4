@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class BlackjackSolitaire {
     private Deck deck;
@@ -33,6 +34,7 @@ public class BlackjackSolitaire {
     }
 
     private int[] positionToIndex(int position){
+        // if invalid position, will return {-1, -1} for {row, col}
         int row = -1;
         int col = -1;
         if (position >= 1 && position <= 5){
@@ -67,9 +69,40 @@ public class BlackjackSolitaire {
         }
     }
 
-    private int getValidInput(){
-        // Handles user input, including error checking for invalid or taken spots
-        return 1;
+    private int getValidInput(String input){
+        // Handles user input, including error checking for invalid or taken spots: return -1 for invalid input
+
+        // handle discard situation
+        if (input.equals("discard")){
+            // check if available discard
+            if (discardsRemaining > 0){
+                // return a random value larger than 16, but not equal to -1 (means invalid input)
+                return 17;
+            } else {
+                System.out.println("No discarding place remaining!\n Please enter a position number between 1 to 16 to place the card.");
+                return -1;
+            }
+
+        // handle placing card situation
+        } else {
+            try {
+                int position = Integer.parseInt(input);
+                // check whether the position is empty
+                int[] index = positionToIndex(position);
+                if (this.gameBoard[index[0]][index[1]] == null){
+                    return position;
+                } else {
+                    System.out.println("Position already occupied!\n Please re-enter an empty position number to " +
+                            "place the card, or enter 'discard' to discard the card..");
+                    return -1;
+                }
+
+            } catch (Exception e){
+                System.out.println("Invalid position!\n Please re-enter an empty position number without spaces " +
+                        "between 1 to 16 to place the card, or enter 'discard' to discard the card.");
+                return -1;
+            }
+        }
     }
 
     private void placeCard(Card card, int position){
@@ -81,7 +114,7 @@ public class BlackjackSolitaire {
         int col = cor[1];
 
         if (row != -1 && col != -1){
-            // valid position, no discard
+            // valid position, place card
             this.gameBoard[row][col] = card;
         } else {
             // discard card
@@ -113,6 +146,13 @@ public class BlackjackSolitaire {
 //        game.placeCard(card2, 13);
 //        game.placeCard(card3, 2);
 //        game.displayBoard();
+
+//        // test 3: test testing user input
+//        Scanner scanner = new Scanner(System.in);
+//        System.out.println("Please place the card 3H: ");
+//        String input = scanner.nextLine();
+//        int position = game.getValidInput(input);
+//        System.out.println("The position is " + position);
 
     }
 }
