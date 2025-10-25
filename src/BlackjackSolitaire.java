@@ -5,6 +5,7 @@ public class BlackjackSolitaire {
     private Deck deck;
     private Card[][] gameBoard;
     private int discardsRemaining;
+    private int cardNum;
 
     public BlackjackSolitaire(){
         // initialize deck and shuffle it
@@ -14,10 +15,43 @@ public class BlackjackSolitaire {
         this.gameBoard = new Card[4][5];
         // initialize discardsRemaining
         this.discardsRemaining = 4;
+        // total card number in the gameboard
+        this.cardNum = 0;
     }
 
     public void play(){
         // The main game loop that drives everything.
+        int round = 1;
+        Scanner scanner = new Scanner(System.in);
+        while (this.cardNum < 3){
+            Card card = deck.deal();
+            System.out.printf("=================== Round %d ===================%n", round);
+
+            System.out.println("Here is the current game board:");
+            displayBoard();
+            System.out.printf("Please place the card '%s' to an empty place by entering the position number" +
+                    ", or entering 'discard' to discard the card (%d discard spaces remaining): "
+                    , card.toString().trim(), this.discardsRemaining);
+            String input = scanner.nextLine();
+            int position = getValidInput(input);
+
+            // invalid input
+            while (position == -1){
+                input = scanner.nextLine();
+                position = getValidInput(input);
+            }
+
+            // valid input, place or discard card
+            placeCard(card, position);
+            System.out.print("===============================================\n\n");
+            round += 1;
+        }
+
+        System.out.println("Congratulation! You finished the game. The final game board:");
+        displayBoard();
+
+        // calculate scores
+
     }
 
     private String getPlaceID(int row, int col){
@@ -116,6 +150,8 @@ public class BlackjackSolitaire {
         if (row != -1 && col != -1){
             // valid position, place card
             this.gameBoard[row][col] = card;
+            // update cardNum
+            this.cardNum += 1;
         } else {
             // discard card
             this.discardsRemaining -= 1;
@@ -154,5 +190,7 @@ public class BlackjackSolitaire {
 //        int position = game.getValidInput(input);
 //        System.out.println("The position is " + position);
 
+        // test 4: play
+        game.play();
     }
 }
