@@ -44,7 +44,7 @@ public class BlackjackSolitaire {
 
             // valid input, place or discard card
             placeCard(card, position);
-            System.out.println("Game board after placing of discarding the card:");
+            System.out.println("Game board after placing or discarding the card:");
             displayBoard();
 
             System.out.print("===============================================\n\n");
@@ -86,7 +86,7 @@ public class BlackjackSolitaire {
         } else if (position >= 11 && position <= 13){
             row = 2;
             col = position - 10;
-        } else if (position >= 13 && position <= 16){
+        } else if (position >= 14 && position <= 16){
             row = 3;
             col = position - 13;
         }
@@ -127,8 +127,23 @@ public class BlackjackSolitaire {
         } else {
             try {
                 int position = Integer.parseInt(input);
-                // check whether the position is empty
+
+                // 17, 18, 19, 20 -> discard
+                if (position >= 17 && position <= 20) {
+                    if (discardsRemaining > 0){
+                        return position;
+                    }
+                    System.out.println("No discarding place remaining! Please enter a position number between 1 to 16 to place the card:");
+                    return -1;
+                }
+
                 int[] index = positionToIndex(position);
+                // check valid index
+                if (index[0] == -1 || index[1] == -1) {
+                    System.out.println("Invalid position! Please enter a position number between 1 to 16 to place the card:");
+                    return -1;
+                }
+                // check whether the position is empty
                 if (this.gameBoard[index[0]][index[1]] == null){
                     return position;
                 } else {
@@ -157,10 +172,10 @@ public class BlackjackSolitaire {
             // valid position, place card
             this.gameBoard[row][col] = card;
             // update cardNum
-            this.cardNum += 1;
+            this.cardNum ++;
         } else {
             // discard card
-            this.discardsRemaining -= 1;
+            this.discardsRemaining --;
         }
 
     }
@@ -183,8 +198,8 @@ public class BlackjackSolitaire {
             }
             scores.add(calculateHandScore(cardList));
         }
-
-        System.out.println(scores);
+        // for debug
+        // System.out.println(scores);
 
         // sum the scores
         int totalScore = 0;
@@ -201,7 +216,9 @@ public class BlackjackSolitaire {
                 totalScore += 4;
             } else if (score == 18) {
                 totalScore += 3;
-            } else if (score <= 16) {
+            } else if (score == 17) {
+                totalScore += 2;
+            }   else if (score <= 16) {
                 totalScore += 1;
             } // > 21: BUST += 0
         }

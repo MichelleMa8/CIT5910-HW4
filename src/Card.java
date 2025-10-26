@@ -11,7 +11,7 @@ public class Card {
     public int getValue(){
         if (this.rank.equals("A")){
             return 11;
-        } else if (this.rank.equals("J") || this.rank.equals("Q") || this.rank.equals("K") || this.rank.length() == 2){
+        } else if (this.rank.equals("J") || this.rank.equals("Q") || this.rank.equals("K") || this.rank.equals("10")){
             return 10;
         } else {
             return this.rank.charAt(0) - '0';
