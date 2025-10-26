@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class BlackjackSolitaire {
@@ -23,14 +24,14 @@ public class BlackjackSolitaire {
         // The main game loop that drives everything.
         int round = 1;
         Scanner scanner = new Scanner(System.in);
-        while (this.cardNum < 3){
+        while (this.cardNum < 16){
             Card card = deck.deal();
             System.out.printf("=================== Round %d ===================%n", round);
 
             System.out.println("Here is the current game board:");
             displayBoard();
             System.out.printf("Please place the card '%s' to an empty place by entering the position number" +
-                    ", or entering 'discard' to discard the card (%d discard spaces remaining): "
+                    ", or entering 'discard' to discard the card (Discards remaining: %d): %n"
                     , card.toString().trim(), this.discardsRemaining);
             String input = scanner.nextLine();
             int position = getValidInput(input);
@@ -43,15 +44,20 @@ public class BlackjackSolitaire {
 
             // valid input, place or discard card
             placeCard(card, position);
+            System.out.println("Game board after placing of discarding the card:");
+            displayBoard();
+
             System.out.print("===============================================\n\n");
             round += 1;
         }
 
         System.out.println("Congratulation! You finished the game. The final game board:");
         displayBoard();
+        System.out.println("Calculating the final score...");
 
         // calculate scores
-
+        int point = calculateTotalScore();
+        System.out.printf("%n%nGame over! You scored %d points.", point);
     }
 
     private String getPlaceID(int row, int col){
@@ -113,7 +119,7 @@ public class BlackjackSolitaire {
                 // return a random value larger than 16, but not equal to -1 (means invalid input)
                 return 17;
             } else {
-                System.out.println("No discarding place remaining!\n Please enter a position number between 1 to 16 to place the card.");
+                System.out.println("No discarding place remaining! Please enter a position number between 1 to 16 to place the card:");
                 return -1;
             }
 
@@ -126,14 +132,14 @@ public class BlackjackSolitaire {
                 if (this.gameBoard[index[0]][index[1]] == null){
                     return position;
                 } else {
-                    System.out.println("Position already occupied!\n Please re-enter an empty position number to " +
-                            "place the card, or enter 'discard' to discard the card..");
+                    System.out.println("Position already occupied! Please re-enter an empty position number to " +
+                            "place the card, or enter 'discard' to discard the card:");
                     return -1;
                 }
 
             } catch (Exception e){
-                System.out.println("Invalid position!\n Please re-enter an empty position number without spaces " +
-                        "between 1 to 16 to place the card, or enter 'discard' to discard the card.");
+                System.out.println("Invalid position! Please re-enter an empty position number without spaces " +
+                        "between 1 to 16 to place the card, or enter 'discard' to discard the card:");
                 return -1;
             }
         }
@@ -161,12 +167,69 @@ public class BlackjackSolitaire {
 
     private int calculateTotalScore(){
         // Loops through all 4 rows and 5 columns, calls calculateHandScore for each, and sums the results.
-        return 1;
+        ArrayList<Integer> scores = new ArrayList<Integer>();
+        ArrayList<Card> cardList;
+        // row scores
+        for (int i = 0; i < gameBoard.length; i++){
+            cardList = new ArrayList<>(Arrays.asList(gameBoard[i]));
+            scores.add(calculateHandScore(cardList));
+        }
+        // col scores
+        for (int c = 0; c < gameBoard[0].length; c++){
+            cardList = new ArrayList<>();
+            for (int r = 0; r < gameBoard.length; r++){
+                Card card = gameBoard[r][c];
+                cardList.add(card);
+            }
+            scores.add(calculateHandScore(cardList));
+        }
+
+        System.out.println(scores);
+
+        // sum the scores
+        int totalScore = 0;
+        for (int j = 0; j < scores.size(); j ++){
+            // Blackjack at index 4 and 8
+            int score = scores.get(j);
+            if ((j == 4 || j == 8) && score == 21){
+                totalScore += 10;
+            } else if (score == 21){
+                totalScore += 7;
+            } else if (score == 20) {
+                totalScore += 5;
+            } else if (score == 19) {
+                totalScore += 4;
+            } else if (score == 18) {
+                totalScore += 3;
+            } else if (score <= 16) {
+                totalScore += 1;
+            } // > 21: BUST += 0
+        }
+        return totalScore;
     }
 
     private int calculateHandScore(ArrayList<Card> hand){
         // The core scoring logic for a single hand.
-        return 1;
+        int score = 0;
+        int aceCount = 0;
+        for (Card curCard : hand){
+            if (curCard != null){
+                // record Ace number
+                if (curCard.getValue() == 11){
+                    aceCount += 1;
+                } else {
+                    score += curCard.getValue();
+                }
+            }
+        }
+
+        // treat Ace value
+        score += aceCount * 11;
+        while (score > 21 && aceCount > 0){
+            score -= 10;
+            aceCount --;
+        }
+        return score;
     }
 
     public static void main(String[] args) {
@@ -190,7 +253,27 @@ public class BlackjackSolitaire {
 //        int position = game.getValidInput(input);
 //        System.out.println("The position is " + position);
 
-        // test 4: play
-        game.play();
+//        // test 4: play
+//        game.play();
+
+        // test 5: scoring
+        game.placeCard(new Card("9", "H"), 1);
+        game.placeCard(new Card("4", "H"), 2);
+        game.placeCard(new Card("7", "H"), 3);
+        game.placeCard(new Card("5", "H"), 4);
+        game.placeCard(new Card("Q", "H"), 5);
+        game.placeCard(new Card("A", "H"), 6);
+        game.placeCard(new Card("2", "H"), 7);
+        game.placeCard(new Card("4", "H"), 8);
+        game.placeCard(new Card("2", "H"), 9);
+        game.placeCard(new Card("A", "H"), 10);
+        game.placeCard(new Card("7", "H"), 11);
+        game.placeCard(new Card("2", "H"), 12);
+        game.placeCard(new Card("A", "H"), 13);
+        game.placeCard(new Card("3", "H"), 14);
+        game.placeCard(new Card("5", "H"), 15);
+        game.placeCard(new Card("J", "H"), 16);
+        int score = game.calculateTotalScore();
+        System.out.println("Total score: " + score);
     }
 }
